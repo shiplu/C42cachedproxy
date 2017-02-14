@@ -1,0 +1,10 @@
+
+Summary
+-------
+The main cached proxy server is written in Tornado. It stores the external api response in redis.
+
+
+1. tornado
+    tornado is a good framework to build REST api quickly. Its fast. Also it has asynchronous feature. Though we are not going to use it. Creating an API in tornado is dead simple. It uses non-blocking IO. It can scale to tens of thousands of open connections, making it ideal for long polling, WebSockets. It helps mobile platform to save latency and bandwidth.
+2. redis
+    For caching api response from calendar42 we are storing them in redis. There are other chaching engines as well. But I am choosing redis because we can keep object in it. For other caching engine we either need to serialize our objects or we need a database. Redis has the combination of both.
