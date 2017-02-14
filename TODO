@@ -1,0 +1,24 @@
+
+Process
+-------
+Each HTTP call to external api should be cached for 4.2 minutes (252 seconds).
+After 4.2 minutes successive calls will maintain If-Modified-Since and If-None-Match header.
+If we get new responose then cache it. If not then extend the time of cache by
+4.2 minutes. Instead of extending the external api can be called again to get the latest content.
+This will save some bandwidth as there may not be updated content. But it'll add latency. 
+
+
+Caching External API
+--------------------
+To make the server horizontally scalable we need a distributed cache server.
+To save the computation time we can directly save the parsed external api response.
+Usually the api will provide response as json text. The json is parsed to dictionary.
+Then only the data required for client's response should be kept in the cache server.
+Redis will be better choice as every entity we save is a response of an api with some
+timing information with it. Like Last-modified, Etag etc.
+
+
+Caching Client
+--------------
+There should be necessary headers so that client can cache it properly.
+Dont make it too complex.
