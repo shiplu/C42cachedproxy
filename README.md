@@ -1,3 +1,28 @@
+Its a GET endpoint `/events-with-subscriptions/` that combines two separate calls towards the C42 API into one response that contains the event title and the first names of its attendees.
+
+How to start
+------------
+
+1. Go to the project directory
+2. Create a ini file `config.ini` using following template
+    ```
+    [DEFAULT]
+    user_id = ....
+    email = ...
+    password = ...
+    api_token = ...
+    service_id = ...
+    event_id = ...
+    cache_driver = redis
+
+    [local]
+    cache_host = 127.0.0.1
+    cache_port = 6379
+
+    ```
+3. Create a virtual environment with python 3 as python binary
+4. Install requirements `pip install -r requirements.txt`
+5. Run the server `python -m cachedproxy.main`. You can find additional options by passing `--help` switch.
 
 Design Consideration
 ====================
