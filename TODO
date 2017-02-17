@@ -23,3 +23,9 @@ Caching Client
 There should be necessary headers so that client can cache it properly.
 Dont make it too complex.
 
+
+Configuration Server
+--------------------
+All the configuration should be loaded from consul server. If server is not reachable or
+not provided it'll fall back to config.ini file. The path to config.ini should be /etc/cachedproxy,
+project directory where its found first.
