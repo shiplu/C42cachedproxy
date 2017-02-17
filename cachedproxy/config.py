@@ -5,6 +5,7 @@ import json
 import consul
 import datetime
 from cachedproxy.environment import ENVIRONTMENTS
+from tornado.log import app_log
 
 
 def factory(environment, consul_host=None):
@@ -91,11 +92,10 @@ class ConfigConsul(Config):
 class ConfigIni(Config):
     def __init__(self, filename):
         parser = configparser.ConfigParser()
-        parser.read(os.path.dirname(os.path.abspath(__file__)) + "/../{}".format(filename))
+        parser.read(os.path.dirname(os.path.abspath(__file__)) +
+                    "/../{}".format(filename))
 
-        self.data = {}
-        if 'Default' in parser.sections():
-            self.data = parser.sections()['Default']
+        self.data = parser['local']
 
     @property
     def user_id(self):

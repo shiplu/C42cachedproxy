@@ -1,9 +1,10 @@
 import tornado.ioloop
 import tornado.web
 from tornado.options import define, parse_command_line, options
-import pprint
+
 from cachedproxy import config
 from cachedproxy import environment
+from cachedproxy import handlers
 
 
 define("env", default="local",
@@ -11,19 +12,14 @@ define("env", default="local",
        % list(environment.ENVIRONTMENTS.keys()))
 
 define("config-server", default=None,
-       help="Configuration server (Consul) hostname. If no server is provided or its unreachable use 'config.ini' file")
-
-
-class EventWithSubscription(tornado.web.RequestHandler):
-    def get(self):
-        self.write("Settings:\n")
-        self.write(pprint.pformat(self.settings, indent=4))
+       help="Configuration server (Consul) hostname. "
+       "If no server is provided or its unreachable use 'config.ini' file")
 
 
 def main():
     parse_command_line()
     app = tornado.web.Application([
-        (r"/events-with-subscriptions/([^/]+)", EventWithSubscription),
+        (r"/events-with-subscriptions/([^/]+)", handlers.EventWithSubscription),
     ], settings={"config": config.factory(options.env)})
     app.listen(8888)
     tornado.ioloop.IOLoop.current().start()
