@@ -7,10 +7,11 @@ import datetime
 from cachedproxy.environment import ENVIRONTMENTS
 
 
-def factory(environment, consul_host):
-    if environment in ENVIRONTMENTS:
+def factory(environment, consul_host=None):
+
+    try:
         return ConfigConsul(ENVIRONTMENTS[environment], consul_host)
-    else:
+    except Exception:
         return ConfigIni("config.ini")
 
 
