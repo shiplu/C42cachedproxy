@@ -1,11 +1,15 @@
 import tornado.ioloop
 import tornado.web
+import tornado.httpserver
 from tornado.options import define, parse_command_line, options
-
+import signal
+from functools import partial
 from cachedproxy import config
 from cachedproxy import environment
 from cachedproxy import handlers
 from cachedproxy import drivers
+from cachedproxy import util
+
 
 define("env", default="local",
        help="Application environment. One of these values %s"
@@ -14,6 +18,10 @@ define("env", default="local",
 define("config-server", default=None,
        help="Configuration server (Consul) hostname. "
        "If no server is provided or its unreachable use 'config.ini' file")
+
+define("shutdown-waittime", default=3,
+       help="Maximum number of seconds to wait to process running requests"
+       " before shutdown")
 
 
 def main():
@@ -25,8 +33,11 @@ def main():
     routes = [(r"/events-with-subscriptions/([^/]+)", handlers.EventWithSubscription)]
     app = tornado.web.Application(routes, cache=cache,
                                   config=config_object)
+    server = tornado.httpserver.HTTPServer(app)
+    server.listen(8888)
 
-    app.listen(8888)
+    signal.signal(signal.SIGTERM, partial(util.sig_handler, server, options.shutdown_waittime))
+    signal.signal(signal.SIGINT, partial(util.sig_handler, server, options.shutdown_waittime))
     tornado.ioloop.IOLoop.current().start()
 
 
