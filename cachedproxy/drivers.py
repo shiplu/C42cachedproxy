@@ -1,6 +1,7 @@
 import abc
-import redis
 import pickle
+
+import redis
 
 
 def factory(engine, **settings):

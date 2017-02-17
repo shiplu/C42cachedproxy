@@ -1,9 +1,11 @@
+import signal
+from functools import partial
+
 import tornado.ioloop
 import tornado.web
 import tornado.httpserver
 from tornado.options import define, parse_command_line, options
-import signal
-from functools import partial
+
 from cachedproxy import config
 from cachedproxy import environment
 from cachedproxy import handlers

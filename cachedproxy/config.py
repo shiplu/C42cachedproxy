@@ -1,9 +1,11 @@
 import os
-import configparser
 import abc
 import json
-import consul
 import datetime
+
+import configparser
+import consul
+
 from cachedproxy.environment import ENVIRONTMENTS
 
 
