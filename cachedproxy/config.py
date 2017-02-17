@@ -1,11 +1,10 @@
 import os
 import configparser
-
+import abc
 import json
 import consul
 import datetime
 from cachedproxy.environment import ENVIRONTMENTS
-from tornado.log import app_log
 
 
 def factory(environment, consul_host=None):
@@ -16,36 +15,59 @@ def factory(environment, consul_host=None):
         return ConfigIni("config.ini")
 
 
-class Config(object):
+class BaseConfig(object):
+    __metaclass__ = abc.ABCMeta
+
     """
     Base config object
     """
     @property
+    @abc.abstractmethod
     def user_id(self):
-        raise Exception("Not implemented")
+        pass
 
     @property
+    @abc.abstractmethod
     def email(self):
-        raise Exception("Not implemented")
+        pass
 
     @property
+    @abc.abstractmethod
     def password(self):
-        raise Exception("Not implemented")
+        pass
 
     @property
+    @abc.abstractmethod
     def api_token(self):
-        raise Exception("Not implemented")
+        pass
 
     @property
+    @abc.abstractmethod
     def service_id(self):
-        raise Exception("Not implemented")
+        pass
 
     @property
+    @abc.abstractmethod
     def event_id(self):
-        raise Exception("Not implemented")
+        pass
+
+    @property
+    @abc.abstractmethod
+    def cache_driver(self):
+        pass
+
+    @property
+    @abc.abstractmethod
+    def cache_host(self):
+        pass
+
+    @property
+    @abc.abstractmethod
+    def cache_port(self):
+        pass
 
 
-class ConfigConsul(Config):
+class ConfigConsul(BaseConfig):
     def __init__(self, environment, consul_host):
         self.consul_client = consul.Consul(host=consul_host)
         self.environment = environment
@@ -88,8 +110,20 @@ class ConfigConsul(Config):
     def event_id(self):
         return self.get_config("event_id")
 
+    @property
+    def cache_driver(self):
+        return self.get_config("cache_driver")
 
-class ConfigIni(Config):
+    @property
+    def cache_host(self):
+        return self.get_config("cache_host")
+
+    @property
+    def cache_port(self):
+        return self.get_config("cache_port")
+
+
+class ConfigIni(BaseConfig):
     def __init__(self, filename):
         parser = configparser.ConfigParser()
         parser.read(os.path.dirname(os.path.abspath(__file__)) +
@@ -120,3 +154,15 @@ class ConfigIni(Config):
     @property
     def event_id(self):
         return self.data.get("event_id")
+
+    @property
+    def cache_driver(self):
+        return self.data.get("cache_driver")
+
+    @property
+    def cache_host(self):
+        return self.data.get("cache_host")
+
+    @property
+    def cache_port(self):
+        return self.data.getint("cache_port")

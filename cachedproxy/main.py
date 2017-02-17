@@ -5,7 +5,7 @@ from tornado.options import define, parse_command_line, options
 from cachedproxy import config
 from cachedproxy import environment
 from cachedproxy import handlers
-
+from cachedproxy import drivers
 
 define("env", default="local",
        help="Application environment. One of these values %s"
@@ -18,9 +18,14 @@ define("config-server", default=None,
 
 def main():
     parse_command_line()
-    app = tornado.web.Application([
-        (r"/events-with-subscriptions/([^/]+)", handlers.EventWithSubscription),
-    ], settings={"config": config.factory(options.env)})
+    config_object = config.factory(options.env, options.config_server)
+    cache = drivers.factory(config_object.cache_driver,
+                            host=config_object.cache_host,
+                            port=config_object.cache_port)
+    routes = [(r"/events-with-subscriptions/([^/]+)", handlers.EventWithSubscription)]
+    app = tornado.web.Application(routes, cache=cache,
+                                  config=config_object)
+
     app.listen(8888)
     tornado.ioloop.IOLoop.current().start()
 
