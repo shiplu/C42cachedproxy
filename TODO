@@ -29,3 +29,13 @@ Configuration Server
 All the configuration should be loaded from consul server. If server is not reachable or
 not provided it'll fall back to config.ini file. The path to config.ini should be /etc/cachedproxy,
 project directory where its found first.
+
+
+Tests
+-----
+The code is written tests in mind. So they are testable. All we need is to add tests.
+
+Configuration
+-------------
+We are mainly reading config from either config.ini or from consul server.
+But we are also reading some values from command line. We should only use the command line config when the config is necessary to start the app. Like consul server address
