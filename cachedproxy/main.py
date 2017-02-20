@@ -1,5 +1,6 @@
 import signal
 from functools import partial
+from datetime import timedelta
 
 import tornado.ioloop
 import tornado.web
@@ -31,7 +32,8 @@ def main():
     config_object = config.factory(options.env, options.config_server)
     cache = drivers.factory(config_object.cache_driver,
                             host=config_object.cache_host,
-                            port=config_object.cache_port)
+                            port=config_object.cache_port,
+                            ttl=timedelta(minutes=4.2).seconds)
     routes = [(r"/events-with-subscriptions/([^/]+)", handlers.EventWithSubscription)]
     app = tornado.web.Application(routes, cache=cache,
                                   config=config_object)

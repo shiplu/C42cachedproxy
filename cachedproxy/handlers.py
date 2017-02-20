@@ -1,6 +1,5 @@
 import requests
 import tornado.web
-from tornado.log import app_log
 
 from cachedproxy.api import Calendar42
 
@@ -18,11 +17,24 @@ class BaseRequestHandler(tornado.web.RequestHandler):
 
 class EventWithSubscription(BaseRequestHandler):
 
+    def get_cached_data(self, cache_key, callback, *callback_args):
+        if self.cache.exists(cache_key):
+            data = self.cache.get(cache_key)
+        else:
+            data = callback(*callback_args)
+            self.cache.set(cache_key, data)
+        return data
+
     def get(self, event_id):
 
         try:
-            event = self.api.events(event_id)
-            subscriptions = self.api.event_subscriptions(event_id)
+            event = self.get_cached_data("events/%s" % event_id,
+                                         self.api.events,
+                                         event_id)
+            subscriptions = self.get_cached_data("event_subscriptions/%s" % event_id,
+                                                 self.api.event_subscriptions,
+                                                 event_id)
+
             subscriber_names = [datum["subscriber"]["first_name"]
                                 for datum in subscriptions["data"]]
             self.write({

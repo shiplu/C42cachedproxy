@@ -35,11 +35,17 @@ class BaseCache(object):
     def set(self, key, value):
         """set value for key. the value is a dict"""
 
+    @abc.abstractmethod
+    def exists(self, key):
+        """Check whether this key exists"""
+
 
 class RedisCache(BaseCache):
 
-    def __init__(self, host, port):
+    def __init__(self, host, port, ttl=None):
+        """host and port for redis and ttl in seconds for keys"""
         self.cluster = redis.StrictRedis(host=host, port=port)
+        self.ttl = ttl
 
     def encode(self, obj):
         """Encodes an object. Object should be dict.
@@ -57,4 +63,11 @@ class RedisCache(BaseCache):
 
     def set(self, key, value):
         """set value for key. the value is a dict"""
-        self.cluster.set(key, self.encode(value))
+        if self.ttl:
+            self.cluster.setex(key, self.ttl, self.encode(value))
+        else:
+            self.cluster.set(key, self.encode(value))
+
+    def exists(self, key):
+        """Check whether this key exists"""
+        return self.cluster.exists(key)
